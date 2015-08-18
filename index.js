@@ -25,35 +25,13 @@ JiraFacade.prototype.createIssue = function (options, callback) {
 	async.waterfall([
 		// get Priority
 		function (next) {
-			that.getPriorityByName(options.priority, function (err, priority) {
-				if (err) {
-					return next(err);
-				}
-				payload.priority = priority;
-				next(null, payload);
-			});
+			that.getPriorityByName(options.priority, handleGetPriority(payload, next));
 		},
 		// get project, issueType, versions and components
 		function (payload, next) {
-			jira.getProject(options.project, function (err, project) {
-				if (err) {
-					return next(err);
-				}
-				payload.project = project;
-				try {
-					payload.issueType = getIssueTypeFromProject(options.issueType, project);
-					if (options.fixVersions) {
-						payload.fixVersions = getVersionsFromProject(options.fixVersions, project);
-					}
-					if (options.components) {
-						payload.components = getComponentsFromProject(options.components, project);
-					}
-				} catch (err) {
-					next(err.message);
-				}
-				next(null, payload);
-			});
+			jira.getProject(options.project, handleGetProject(options, payload, next));
 		},
+		// create Issue
 		function (payload, next) {
 			var issueOptions = createIssueOptions(payload, options);
 
@@ -69,22 +47,6 @@ JiraFacade.prototype.createIssue = function (options, callback) {
 		callback(err, payload);
 	});
 };
-
-function filterVersionsByName(versionName, callback) {
-	var version,
-		matches;
-	return function (err, versions) {
-		matches = versions.filter(function (obj) {
-			return obj.name.toLowerCase() === versionName.toLowerCase();
-		});
-		if (matches.length) {
-			version = matches[0];
-			callback(err, version);
-		} else {
-			callback('Issue Type "' + versionName + '" not found in project "' + project + '".');
-		}
-	}
-}
 
 JiraFacade.prototype.getVersionByName = function (project, versionName, callback) {
 	jira.getVersions(project, filterVersionsByName(versionName, callback));
@@ -106,27 +68,15 @@ JiraFacade.prototype.getPriorityById = function (priorityId, callback) {
 };
 
 JiraFacade.prototype.getIssueTypeByName = function (issueTypeName, callback) {
-	var issueType;
 	if (!issueTypeName) {
 		return callback('Issue Type Name must be a non-zero length string.');
 	}
-	jira.listIssueTypes(function (err, types) {
-		if (err) {
-			return callback(err);
-		}
-		var matches = types.filter(function (obj) {
-			return obj.name.toLowerCase() === issueTypeName.toLowerCase();
-		});
-		if (matches.length) {
-			issueType = matches[0];
-			callback(err, issueType);
-		} else {
-			callback('Issue Type "' + issueTypeName + '" not found.');
-		}
-	});
+	jira.listIssueTypes(filterIssueTypesByName(issueTypeName, callback));
 };
 
-
+// ********************************************************************
+// Utility Methods and Handlers
+// ********************************************************************
 function getComponentsFromProject(componentNames, project) {
 	return getItemsFromProject(componentNames, project, 'component');
 }
@@ -228,6 +178,53 @@ function createIssueOptions(payload, options) {
 	return issueOptions;
 }
 
+function handleGetPriority(payload, next) {
+	return function (err, priority) {
+		if (err) {
+			return next(err);
+		}
+		payload.priority = priority;
+		next(null, payload);
+	}
+}
+
+function handleGetProject(options, payload, next) {
+	return function (err, project) {
+		if (err) {
+			return next(err);
+		}
+		payload.project = project;
+		try {
+			payload.issueType = getIssueTypeFromProject(options.issueType, project);
+			if (options.fixVersions) {
+				payload.fixVersions = getVersionsFromProject(options.fixVersions, project);
+			}
+			if (options.components) {
+				payload.components = getComponentsFromProject(options.components, project);
+			}
+		} catch (err) {
+			next(err.message);
+		}
+		next(null, payload);
+	}
+}
+
+function filterVersionsByName(versionName, callback) {
+	var version,
+		matches;
+	return function (err, versions) {
+		matches = versions.filter(function (obj) {
+			return obj.name.toLowerCase() === versionName.toLowerCase();
+		});
+		if (matches.length) {
+			version = matches[0];
+			callback(err, version);
+		} else {
+			callback('Issue Type "' + versionName + '" not found in project "' + project + '".');
+		}
+	}
+}
+
 function filterPrioritiesByName(priorityName, callback) {
 	var priority;
 	return function (err, priorities) {
@@ -262,6 +259,24 @@ function filterPrioritiesById(priorityId, callback) {
 			callback('Priority ID ' + priorityId + ' not found.');
 		}
 	};
+}
+
+function filterIssueTypesByName(issueTypeName, callback) {
+	var issueType;
+	return function (err, types) {
+		if (err) {
+			return callback(err);
+		}
+		var matches = types.filter(function (obj) {
+			return obj.name.toLowerCase() === issueTypeName.toLowerCase();
+		});
+		if (matches.length) {
+			issueType = matches[0];
+			callback(err, issueType);
+		} else {
+			callback('Issue Type "' + issueTypeName + '" not found.');
+		}
+	}
 }
 
 function isNumeric(obj) {
