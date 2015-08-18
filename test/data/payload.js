@@ -15,16 +15,16 @@ module.exports = {
 		"self": "https://jira.example.com/rest/api/2/project/14100",
 		"id": "14100",
 		"key": "EXAMPLEKEY",
-		"description": "A project to receive and manage alerts from the C3PO Monitoring System.",
+		"description": "Example project description.",
 		"lead": {
 			"self": "https://jira.example.com/rest/api/2/user?username=testuser",
 			"key": "testuser",
 			"name": "testuser",
 			"avatarUrls": {
-				"16x16": "https://secure.gravatar.com/avatar/***REDACTED***?d=mm&s=16",
-				"24x24": "https://secure.gravatar.com/avatar/***REDACTED***?d=mm&s=24",
-				"32x32": "https://secure.gravatar.com/avatar/***REDACTED***?d=mm&s=32",
-				"48x48": "https://secure.gravatar.com/avatar/***REDACTED***?d=mm&s=48"
+				"16x16": "https://secure.gravatar.com/avatar/****REDACTED***?d=mm&s=16",
+				"24x24": "https://secure.gravatar.com/avatar/****REDACTED***?d=mm&s=24",
+				"32x32": "https://secure.gravatar.com/avatar/****REDACTED***?d=mm&s=32",
+				"48x48": "https://secure.gravatar.com/avatar/****REDACTED***?d=mm&s=48"
 			},
 			"displayName": "Brent Price",
 			"active": true
@@ -45,7 +45,7 @@ module.exports = {
 			{
 				"self": "https://jira.example.com/rest/api/2/component/14411",
 				"id": "14411",
-				"name": "Responsys",
+				"name": "Services",
 				"isAssigneeTypeValid": false
 			},
 			{
@@ -138,9 +138,17 @@ module.exports = {
 				"archived": false,
 				"released": false,
 				"projectId": 14100
+			},
+			{
+				"self": "https://jira.example.com/rest/api/2/version/17155",
+				"id": "17155",
+				"name": "1.0.0",
+				"archived": false,
+				"released": false,
+				"projectId": 14100
 			}
 		],
-		"name": "C3PO Alert Activity",
+		"name": "Example Jira Project Name",
 		"roles": {
 			"Read-Only": "https://jira.example.com/rest/api/2/project/14100/role/10302",
 			"Technology Approvers": "https://jira.example.com/rest/api/2/project/14100/role/10103",
@@ -163,8 +171,8 @@ module.exports = {
 		"projectCategory": {
 			"self": "https://jira.example.com/rest/api/2/projectCategory/10000",
 			"id": "10000",
-			"name": "EXAMPLE |  CRM",
-			"description": "***REDACTED*** CRM"
+			"name": "Example Category",
+			"description": "Example category description."
 		}
 	},
 	"issueType": {
