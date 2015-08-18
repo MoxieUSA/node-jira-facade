@@ -70,11 +70,10 @@ JiraFacade.prototype.createIssue = function (options, callback) {
 	});
 };
 
-JiraFacade.prototype.getVersionByName = function (project, versionName, callback) {
+function filterVersionsByName(versionName, callback) {
 	var version,
 		matches;
-
-	jira.getVersions(project, function (err, versions) {
+	return function (err, versions) {
 		matches = versions.filter(function (obj) {
 			return obj.name.toLowerCase() === versionName.toLowerCase();
 		});
@@ -84,25 +83,15 @@ JiraFacade.prototype.getVersionByName = function (project, versionName, callback
 		} else {
 			callback('Issue Type "' + versionName + '" not found in project "' + project + '".');
 		}
-	});
+	}
+}
+
+JiraFacade.prototype.getVersionByName = function (project, versionName, callback) {
+	jira.getVersions(project, filterVersionsByName(versionName, callback));
 };
 
 JiraFacade.prototype.getPriorityByName = function (priorityName, callback) {
-	var priority;
-	jira.listPriorities(function (err, priorities) {
-		if (err) {
-			return callback(err);
-		}
-		var matches = priorities.filter(function (obj) {
-			return obj.name.toLowerCase() === priorityName.toLowerCase();
-		});
-		if (matches.length) {
-			priority = matches[0];
-			callback(err, priority);
-		} else {
-			callback('No priority called "' + priorityName + '" could be found.');
-		}
-	});
+	jira.listPriorities(filterPrioritiesByName(priorityName, callback));
 };
 
 JiraFacade.prototype.getPriorityById = function (priorityId, callback) {
@@ -113,21 +102,7 @@ JiraFacade.prototype.getPriorityById = function (priorityId, callback) {
 		return;
 	}
 
-	var priority;
-	jira.listPriorities(function (err, priorities) {
-		if (err) {
-			return callback(err);
-		}
-		var matches = priorities.filter(function (obj) {
-			return parseInt(obj.id) === priorityId;
-		});
-		if (matches.length) {
-			priority = matches[0];
-			callback(err, priority);
-		} else {
-			callback('Priority ID ' + priorityId + ' not found.');
-		}
-	});
+	jira.listPriorities(filterPrioritiesById(priorityId, callback));
 };
 
 JiraFacade.prototype.getIssueTypeByName = function (issueTypeName, callback) {
@@ -251,6 +226,42 @@ function createIssueOptions(payload, options) {
 		});
 	}
 	return issueOptions;
+}
+
+function filterPrioritiesByName(priorityName, callback) {
+	var priority;
+	return function (err, priorities) {
+		if (err) {
+			return callback(err);
+		}
+		var matches = priorities.filter(function (obj) {
+			return obj.name.toLowerCase() === priorityName.toLowerCase();
+		});
+		if (matches.length) {
+			priority = matches[0];
+			callback(err, priority);
+		} else {
+			callback('No priority called "' + priorityName + '" could be found.');
+		}
+	};
+}
+
+function filterPrioritiesById(priorityId, callback) {
+	var priority;
+	return function (err, priorities) {
+		if (err) {
+			return callback(err);
+		}
+		var matches = priorities.filter(function (obj) {
+			return parseInt(obj.id) === priorityId;
+		});
+		if (matches.length) {
+			priority = matches[0];
+			callback(err, priority);
+		} else {
+			callback('Priority ID ' + priorityId + ' not found.');
+		}
+	};
 }
 
 function isNumeric(obj) {
