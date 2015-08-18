@@ -4,7 +4,7 @@
   "description": "Facade to the jira wrapper module that simplifies some of the more tedious processes.",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/mocha test/*"
+    "test": "node_modules/.bin/mocha test/*.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,8 @@
   },
   "devDependencies": {
     "chai": "^3.2.0",
-    "mocha": "^2.2.5"
+    "mocha": "^2.2.5",
+    "rewire": "^2.3.4",
+    "sinon": "^1.15.4"
   }
 }
