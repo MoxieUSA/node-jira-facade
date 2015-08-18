@@ -213,6 +213,9 @@ function filterVersionsByName(versionName, callback) {
 	var version,
 		matches;
 	return function (err, versions) {
+		if (err) {
+			return callback(err);
+		}
 		matches = versions.filter(function (obj) {
 			return obj.name.toLowerCase() === versionName.toLowerCase();
 		});
@@ -220,7 +223,7 @@ function filterVersionsByName(versionName, callback) {
 			version = matches[0];
 			callback(err, version);
 		} else {
-			callback('Issue Type "' + versionName + '" not found in project "' + project + '".');
+			callback('Issue Type "' + versionName + '" not found.');
 		}
 	}
 }
