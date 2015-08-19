@@ -1,5 +1,7 @@
 # jira-facade
 
+[![Build Status](https://travis-ci.org/MoxieUSA/node-jira-facade.svg?branch=master)](https://travis-ci.org/MoxieUSA/node-jira-facade)
+
 The goal of jira-facade is to be a simple facade to the [jira][jira] wrapper module that simplifies some of the more tedious processes such as getting IDs for versions, priorities, components, etc.
 
 **NOTE:** Better documentation is coming.
