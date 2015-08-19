@@ -9,14 +9,14 @@ var async = require('async'),
 	jira;
 
 module.exports = JiraFacade = function (config) {
-	if (!config.protocol || !config.host || !config.user.username || !config.user.password) {
+	if (!config.protocol || !config.host || !config.username || !config.password) {
 		throw new Error('protocol, host, username and password are required.');
 	}
 	if (!config.port) {
 		config.port = (config.protocol.toLowerCase() === 'https') ? 443 : 80;
 	}
 	config.apiVersion = config.apiVersion || 2;
-	this.jira = jira = new JiraApi(config.protocol, config.host, config.port, config.user.username, config.user.password, config.apiVersion);
+	this.jira = jira = new JiraApi(config.protocol, config.host, config.port, config.username, config.password, config.apiVersion);
 };
 
 JiraFacade.prototype.createIssue = function (options, callback) {
