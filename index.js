@@ -185,7 +185,7 @@ function handleGetPriority(payload, next) {
 		}
 		payload.priority = priority;
 		next(null, payload);
-	}
+	};
 }
 
 function handleGetProject(options, payload, next) {
@@ -206,7 +206,7 @@ function handleGetProject(options, payload, next) {
 			next(err.message);
 		}
 		next(null, payload);
-	}
+	};
 }
 
 function filterVersionsByName(versionName, callback) {
@@ -225,7 +225,7 @@ function filterVersionsByName(versionName, callback) {
 		} else {
 			callback('Issue Type "' + versionName + '" not found.');
 		}
-	}
+	};
 }
 
 function filterPrioritiesByName(priorityName, callback) {
@@ -279,7 +279,7 @@ function filterIssueTypesByName(issueTypeName, callback) {
 		} else {
 			callback('Issue Type "' + issueTypeName + '" not found.');
 		}
-	}
+	};
 }
 
 function isNumeric(obj) {
