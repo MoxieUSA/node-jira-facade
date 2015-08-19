@@ -13,35 +13,27 @@ describe('Test jira-facade', function () {
 			expect(JiraFacade.bind(JiraFacade, {
 				protocol: 'https',
 				host: 'localhost',
-				user: {
-					username: 'keith'
-				}
+				username: 'keith'
 			})).to.throw(Error);
 			expect(JiraFacade.bind(JiraFacade, {
 				protocol: 'https',
 				host: 'localhost',
-				user: {
-					username: 'keith',
-					password: 'password'
-				}
+				username: 'keith',
+				password: 'password'
 			})).to.not.throw(Error);
 		});
 		it('Should properly set the port if not passed in', function () {
 			var optionsHTTPS = {
 				protocol: 'https',
 				host: 'localhost',
-				user: {
-					username: 'keith',
-					password: 'password'
-				}
+				username: 'keith',
+				password: 'password'
 			};
 			var optionsHTTP = {
 				protocol: 'http',
 				host: 'localhost',
-				user: {
-					username: 'keith',
-					password: 'password'
-				}
+				username: 'keith',
+				password: 'password'
 			};
 			new JiraFacade(optionsHTTPS);
 			expect(optionsHTTPS.port).to.equal(443);
