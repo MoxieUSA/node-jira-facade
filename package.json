@@ -1,6 +1,6 @@
 {
   "name": "jira-facade",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Facade to the jira wrapper module that simplifies some of the more tedious processes.",
   "main": "index.js",
   "scripts": {
