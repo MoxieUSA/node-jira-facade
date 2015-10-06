@@ -101,7 +101,7 @@ module.exports = JiraFacade = function (config) {
 			if (response.statusCode !== 204) {
 				return callback(response.statusCode + ': Unable to connect to JIRA to add user as watcher.');
 			}
-
+			return callback(null, 'Successfully added ' + username + ' as a watcher.');
 		});
 
 	};
