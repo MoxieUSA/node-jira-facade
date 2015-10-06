@@ -90,7 +90,6 @@ module.exports = JiraFacade = function (config) {
 		};
 
 		this.jira.doRequest(options, function (error, response) {
-			console.log(response.toJSON());
 			if (error) {
 				return callback(error);
 			}
