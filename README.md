@@ -73,6 +73,16 @@ jiraFacade.createIssue({
 * `priority` (string) Severity name (e.g. Critical)
 * `labels` (Array) Array of string labels to apply to the issue
 
+### addWatcher(issueKey, username, callback)
+
+Adds the user `username` to the issue `issueKey`
+
+```javascript
+jiraFacade.addUser('MYPROJ-548', 'kmorris', function(err){
+	console.log("Error:", err);
+});
+```
+
 ### getVersionByName(project, versionName, callback)
 
 Returns a JIRA `version` object from a specific project based on the name of that version.
