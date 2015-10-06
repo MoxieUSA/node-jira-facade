@@ -1,13 +1,15 @@
 /**
  * Created by Keith Morris on 8/17/15.
  */
+"use strict";
+
 var expect = require('chai').expect,
 	rewire = require('rewire'),
 	JiraFacade = rewire('../index.js'),
 	sinon = require('sinon');
 
 describe('Test jira-facade', function () {
-	describe('Test initialization', function () {
+	describe('Object instantiation', function () {
 		it('Should throw error if parameters are not correct', function () {
 			expect(JiraFacade).to.throw(Error);
 			expect(JiraFacade.bind(JiraFacade, {
@@ -35,9 +37,10 @@ describe('Test jira-facade', function () {
 				username: 'keith',
 				password: 'password'
 			};
-			new JiraFacade(optionsHTTPS);
+			var jiraFacade;
+			jiraFacade = new JiraFacade(optionsHTTPS);
 			expect(optionsHTTPS.port).to.equal(443);
-			new JiraFacade(optionsHTTP);
+			jiraFacade = new JiraFacade(optionsHTTP);
 			expect(optionsHTTP.port).to.equal(80);
 		});
 	});
@@ -102,7 +105,7 @@ describe('Test jira-facade', function () {
 				expect(payload.priority.name).to.equal('Critical');
 			};
 			handleGetPriority = JiraFacade.__get__('handleGetPriority');
-			handleGetPriority(payload, next)(null, rewire('./data/priority.js'))
+			handleGetPriority(payload, next)(null, rewire('./data/priority.js'));
 		});
 		it('Should handleGetProject properly', function () {
 			var options, project, payload, next, handleGetProject;
@@ -131,7 +134,7 @@ describe('Test jira-facade', function () {
 		});
 		it('Should filterVersionsByName properly', function () {
 			var filterVersionsByName;
-			callback = function (err, version) {
+			var callback = function (err, version) {
 				if (err) {
 					expect(err).to.equal('Issue Type "NonExistentVersion" not found.');
 					return;
@@ -145,7 +148,7 @@ describe('Test jira-facade', function () {
 		});
 		it('Should filterPrioritiesByName properly', function () {
 			var filterPrioritiesByName;
-			callback = function (err, priority) {
+			var callback = function (err, priority) {
 				if (err) {
 					expect(err).to.equal('No priority called "NonExistentPriority" could be found.');
 					return;
@@ -159,7 +162,7 @@ describe('Test jira-facade', function () {
 		});
 		it('Should filterPrioritiesById properly', function () {
 			var filterPrioritiesById;
-			callback = function (err, priority) {
+			var callback = function (err, priority) {
 				if (err) {
 					expect(err).to.equal('Priority ID 72 not found.');
 					return;
@@ -173,7 +176,7 @@ describe('Test jira-facade', function () {
 		});
 		it('Should filterIssueTypesByName properly', function () {
 			var filterIssueTypesByName;
-			callback = function (err, priority) {
+			var callback = function (err, priority) {
 				if (err) {
 					expect(err).to.equal('Issue Type "NonExistentIssueType" not found.');
 					return;
