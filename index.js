@@ -19,60 +19,96 @@ module.exports = JiraFacade = function (config) {
 	this.jira = jira = new JiraApi(config.protocol, config.host, config.port, config.username, config.password, config.apiVersion);
 };
 
-JiraFacade.prototype.createIssue = function (options, callback) {
-	var that = this,
-		payload = {};
-	async.waterfall([
-		// get Priority
-		function (next) {
-			that.getPriorityByName(options.priority, handleGetPriority(payload, next));
-		},
-		// get project, issueType, versions and components
-		function (payload, next) {
-			jira.getProject(options.project, handleGetProject(options, payload, next));
-		},
-		// create Issue
-		function (payload, next) {
-			var issueOptions = createIssueOptions(payload, options);
+// ********************************************************************
+// Instance Methods
+// ********************************************************************
+(function () {
+	this.createIssue = function (options, callback) {
+		var that = this,
+			payload = {};
+		async.waterfall([
+			// get Priority
+			function (next) {
+				that.getPriorityByName(options.priority, handleGetPriority(payload, next));
+			},
+			// get project, issueType, versions and components
+			function (payload, next) {
+				jira.getProject(options.project, handleGetProject(options, payload, next));
+			},
+			// create Issue
+			function (payload, next) {
+				var issueOptions = createIssueOptions(payload, options);
 
-			jira.addNewIssue(issueOptions, function (err, issue) {
-				if (err) {
-					return next(err);
-				} else {
-					next(null, issue);
-				}
-			});
+				jira.addNewIssue(issueOptions, function (err, issue) {
+					if (err) {
+						return next(err);
+					} else {
+						next(null, issue);
+					}
+				});
+			}
+		], function (err, payload) {
+			callback(err, payload);
+		});
+	};
+
+	this.getVersionByName = function (project, versionName, callback) {
+		jira.getVersions(project, filterVersionsByName(versionName, callback));
+	};
+
+	this.getPriorityByName = function (priorityName, callback) {
+		jira.listPriorities(filterPrioritiesByName(priorityName, callback));
+	};
+
+	this.getPriorityById = function (priorityId, callback) {
+		priorityId = parseInt(priorityId);
+		// if it is not a number, error
+		if (!isNumeric(priorityId)) {
+			callback('Priority ID must be numeric.');
+			return;
 		}
-	], function (err, payload) {
-		callback(err, payload);
-	});
-};
 
-JiraFacade.prototype.getVersionByName = function (project, versionName, callback) {
-	jira.getVersions(project, filterVersionsByName(versionName, callback));
-};
+		jira.listPriorities(filterPrioritiesById(priorityId, callback));
+	};
 
-JiraFacade.prototype.getPriorityByName = function (priorityName, callback) {
-	jira.listPriorities(filterPrioritiesByName(priorityName, callback));
-};
+	this.getIssueTypeByName = function (issueTypeName, callback) {
+		if (!issueTypeName) {
+			return callback('Issue Type Name must be a non-zero length string.');
+		}
+		jira.listIssueTypes(filterIssueTypesByName(issueTypeName, callback));
+	};
 
-JiraFacade.prototype.getPriorityById = function (priorityId, callback) {
-	priorityId = parseInt(priorityId);
-	// if it is not a number, error
-	if (!isNumeric(priorityId)) {
-		callback('Priority ID must be numeric.');
-		return;
-	}
+	this.addWatcher = function (issueKey, username, callback) {
 
-	jira.listPriorities(filterPrioritiesById(priorityId, callback));
-};
+		var options = {
+			rejectUnauthorized: this.jira.strictSSL,
+			uri: this.jira.makeUri('/issue/' + issueKey + '/watchers'),
+			method: 'POST',
+			followAllRedirects: true,
+			json: true,
+			body: JSON.stringify(username)
+		};
 
-JiraFacade.prototype.getIssueTypeByName = function (issueTypeName, callback) {
-	if (!issueTypeName) {
-		return callback('Issue Type Name must be a non-zero length string.');
-	}
-	jira.listIssueTypes(filterIssueTypesByName(issueTypeName, callback));
-};
+		this.jira.doRequest(options, function (error, response) {
+			if (error) {
+				return callback(error);
+			}
+
+			if (response.statusCode === 404) {
+				return callback('Invalid URL');
+			}
+
+			if (response.statusCode !== 204) {
+				return callback(response.statusCode + ': Unable to connect to JIRA to add user as watcher.');
+			}
+
+		});
+
+	};
+
+	this.addWatchersToIssue = this.addWatcher.bind(this);
+
+}.call(JiraFacade.prototype));
 
 // ********************************************************************
 // Utility Methods and Handlers
@@ -185,7 +221,7 @@ function handleGetPriority(payload, next) {
 		}
 		payload.priority = priority;
 		next(null, payload);
-	}
+	};
 }
 
 function handleGetProject(options, payload, next) {
@@ -206,7 +242,7 @@ function handleGetProject(options, payload, next) {
 			next(err.message);
 		}
 		next(null, payload);
-	}
+	};
 }
 
 function filterVersionsByName(versionName, callback) {
@@ -225,7 +261,7 @@ function filterVersionsByName(versionName, callback) {
 		} else {
 			callback('Issue Type "' + versionName + '" not found.');
 		}
-	}
+	};
 }
 
 function filterPrioritiesByName(priorityName, callback) {
@@ -279,7 +315,7 @@ function filterIssueTypesByName(issueTypeName, callback) {
 		} else {
 			callback('Issue Type "' + issueTypeName + '" not found.');
 		}
-	}
+	};
 }
 
 function isNumeric(obj) {
